@@ -11,13 +11,14 @@ morgan.token('body', (req) => req.method === 'POST' ? JSON.stringify(req.body) :
 app.use(morgan(':method :url :status :response-time ms :body'));
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static('build'))
 
 const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(newPersons, null, 4));
 
 const generateId = () => Math.floor(Math.random() * 999999999);
 
 
-app.get('/', (req, res) => res.send('Hello from phonebook'));
+app.get('/', (req, res) => res.send('Hello from '));
 
 
 app.get('/info', (req, res) => {
