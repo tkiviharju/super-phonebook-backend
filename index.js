@@ -17,7 +17,7 @@ const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(n
 const generateId = () => Math.floor(Math.random() * 999999999);
 
 
-app.get('/', (req, res) => res.redirect('/info'));
+app.get('/', (req, res) => res.send('Hello from phonebook'));
 
 
 app.get('/info', (req, res) => {
@@ -68,7 +68,7 @@ app.delete('/api/persons/:id', (req, res) => {
 });
 
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
