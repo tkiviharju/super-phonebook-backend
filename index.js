@@ -2,11 +2,14 @@ const express = require('express');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const cors = require('cors');
+
 const app = express();
 const persons = require('./persons.json');
 
 morgan.token('body', (req) => req.method === 'POST' ? JSON.stringify(req.body) : '');
 app.use(morgan(':method :url :status :response-time ms :body'));
+app.use(cors());
 app.use(bodyParser.json());
 
 const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(newPersons, null, 4));
