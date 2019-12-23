@@ -18,9 +18,6 @@ const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(n
 const generateId = () => Math.floor(Math.random() * 999999999);
 
 
-app.get('/', (req, res) => res.send('Hello from '));
-
-
 app.get('/info', (req, res) => {
 	console.log(req.method)
 	const message = `Phonebook has info for ${persons.length} people <br><br> ${new Date()}`;
