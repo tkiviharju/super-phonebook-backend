@@ -17,7 +17,7 @@ const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(n
 const generateId = () => Math.floor(Math.random() * 999999999);
 
 
-app.get('/', (req, res) => res.redirect('/info'));
+app.get('/', (req, res) => res.send('Hello from phonebook'));
 
 
 app.get('/info', (req, res) => {
