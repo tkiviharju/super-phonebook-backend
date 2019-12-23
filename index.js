@@ -5,12 +5,11 @@ const morgan = require('morgan');
 const app = express();
 const persons = require('./persons.json');
 
-app.use(morgan('tiny'));
+morgan.token('body', (req) => req.method === 'POST' ? JSON.stringify(req.body) : '');
+app.use(morgan(':method :url :status :response-time ms :body'));
 app.use(bodyParser.json());
 
-
 const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(newPersons, null, 4));
-
 
 const generateId = () => Math.floor(Math.random() * 999999999);
 
@@ -19,6 +18,7 @@ app.get('/', (req, res) => res.redirect('/info'));
 
 
 app.get('/info', (req, res) => {
+	console.log(req.method)
 	const message = `Phonebook has info for ${persons.length} people <br><br> ${new Date()}`;
 	return res.send(message);
 });
