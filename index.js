@@ -1,21 +1,17 @@
+require('dotenv').config();
 const express = require('express');
-const fs = require('fs');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
 
 const app = express();
-const persons = require('./persons.json');
+const Person = require('./models/person.js');
 
 morgan.token('body', (req) => req.method === 'POST' ? JSON.stringify(req.body) : '');
 app.use(morgan(':method :url :status :response-time ms :body'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('build'))
-
-const save = (newPersons) => fs.writeFileSync('./persons.json', JSON.stringify(newPersons, null, 4));
-
-const generateId = () => Math.floor(Math.random() * 999999999);
 
 
 app.get('/info', (req, res) => {
@@ -25,7 +21,14 @@ app.get('/info', (req, res) => {
 });
 
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', async (req, res) => {
+	let persons;
+	try {
+		persons = await Person.find({});
+	} catch (err){
+		console.log(err);
+		return res.status(400).send({error: 'error with getting persons'});
+	}
 	return res.send(persons);
 });
 
@@ -33,40 +36,40 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/persons/:id', (req, res) => {
 	const { id } = req.params;
 	
-	const person = persons.find(person => person.id === parseInt(id));
-	return person ? res.status(200).send(person) : res.sendStatus(404);
+	const personToGet = Person.findById(id);
+	return personToGet ? res.status(200).send(personToGet) : res.sendStatus(404);
 });
 
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', async (req, res) => {
+	console.log('api/persons post')
 	const { name, number } = req.body;
 	if (!name || !number){
 		return res.status(400).json({error: 'name or number missing'});
 	}
-	const nameAlreadyInPersons = persons.find(person => person.name.toLowerCase() === name.toLowerCase());
-	if (nameAlreadyInPersons){
-		return res.status(400).json({error: 'name must be unique'});
+	console.log('next')
+	let person = new Person({ name, number });
+	try {
+		person = await person.save();
+		console.log(person)
+	} catch (error){
+		console.log(error)
+		return res.status(400).send({error: 'Failed to save new person'});
 	}
-	const id = generateId();
-	const person = { name, number, id };
-
-	const newPersons = persons.concat(person);
-	save(newPersons);
-	
 	return res.status(201).send(person);
 });
 
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', async (req, res) => {
+	console.log('deleting')
 	const { id } = req.params;
-	const newPersons = persons.filter(person => person.id !== parseInt(id));
-	save(newPersons);
+	await Person.findByIdAndRemove(id);
 
 	return res.sendStatus(204);
 });
 
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`)
-})
+	console.log(`Server running on port ${PORT}`);
+});
