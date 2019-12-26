@@ -33,11 +33,16 @@ app.get('/api/persons', async (req, res) => {
 });
 
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', async (req, res) => {
 	const { id } = req.params;
-	
-	const personToGet = Person.findById(id);
-	return personToGet ? res.status(200).send(personToGet) : res.sendStatus(404);
+	let person;
+	try {
+		person = await Person.findById(id);
+	} catch (error) {
+		console.log('error', error);
+		return res.sendStatus(404);
+	}
+	return res.status(200).send(person);
 });
 
 
