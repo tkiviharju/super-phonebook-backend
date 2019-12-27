@@ -16,8 +16,16 @@ app.use(bodyParser.json());
 app.use(express.static('build'))
 
 
-app.get('/info', (req, res) => {
-	const message = `Phonebook has info for ${persons.length} people <br><br> ${new Date()}`;
+app.get('/info', async (req, res) => {
+	let count;
+	try {
+		count = await Person.countDocuments({});
+		if (!count) return res.sendStatus(400);
+	} catch (error){
+		next(error);
+	}
+
+	const message = `Phonebook has info for ${count} people <br><br> ${new Date()}`;
 	return res.send(message);
 });
 
