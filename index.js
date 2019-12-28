@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(express.static('build'))
 
 
-app.get('/info', async (req, res) => {
+app.get('/info', async (req, res, next) => {
 	let count;
 	try {
 		count = await Person.countDocuments({});
@@ -30,7 +30,7 @@ app.get('/info', async (req, res) => {
 });
 
 
-app.get('/api/persons', async (req, res) => {
+app.get('/api/persons', async (req, res, next) => {
 	let persons;
 	try {
 		persons = await Person.find({});
@@ -54,7 +54,7 @@ app.get('/api/persons/:id', async (req, res, next) => {
 });
 
 
-app.post('/api/persons', async (req, res) => {
+app.post('/api/persons', async (req, res, next) => {
 	const { name, number } = req.body;
 	if (!name || !number){
 		return res.status(400).json({error: 'name or number missing'});
@@ -83,7 +83,7 @@ app.put('/api/persons/:id', async (req, res, next) => {
 });
 
 
-app.delete('/api/persons/:id', async (req, res) => {
+app.delete('/api/persons/:id', async (req, res, next) => {
 	const { id } = req.params;
 	try {
 		await Person.findByIdAndRemove(id);
@@ -102,7 +102,9 @@ app.use(unknownEndpoint);
 const errorHandler = (error, req, res, next) => {
 	console.error(error.message);
 	if (error.name === 'CastError' && error.kind == 'ObjectId') {
-	  return res.status(400).send({ error: 'malformatted id' });
+	  	return res.status(400).send({ error: 'malformatted id' });
+	} else if (error.name === 'ValidationError') {
+		return res.status(400).send({ error: error.message });
 	}
 	return res.status(400).send({ error: 'error with request'});
 }
