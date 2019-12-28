@@ -14,9 +14,9 @@ if (!name || !number){
 	});
 }
 
-const person = new Person({ name, number })
+const person = new Person({ name, number });
 
 person.save().then(() => {
-console.log(`added ${name} with number ${number} to phonebook`);
-mongoose.connection.close();
-})
+	console.log(`added ${name} with number ${number} to phonebook`);
+	mongoose.connection.close();
+});
